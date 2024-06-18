@@ -1,32 +1,56 @@
+import requests
 from flask import Flask, request, jsonify, send_from_directory
-import joblib
-import pandas as pd
-from datetime import datetime
 
 app = Flask(__name__)
 
-# Load the model
-model = joblib.load('flight_price_model.pkl')
+# Replace 'YOUR_RAPIDAPI_KEY' with your actual RapidAPI key
+RAPIDAPI_KEY = 'efc4bc7378msha129e8a1e7b01f0p1a7ce3jsnc3f0e9c11c01'
 
 @app.route('/')
 def index():
     return send_from_directory('', 'index.html')
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/predict_flight_price', methods=['POST'])
+def predict_flight_price():
     data = request.get_json()
-    date = data['date']
-    day_of_week = datetime.strptime(date, '%Y-%m-%d').weekday()
-    days_until_flight = (datetime.strptime(date, '%Y-%m-%d') - datetime.now()).days
-    input_data = pd.DataFrame({
-        'day_of_week': [day_of_week],
-        'days_until_flight': [days_until_flight]
-    })
-    predicted_price = model.predict(input_data)[0]
-    return jsonify({'predicted_price': predicted_price})
+    origin_sky_id = data['origin_sky_id']
+    destination_sky_id = data['destination_sky_id']
+    origin_entity_id = data['origin_entity_id']
+    destination_entity_id = data['destination_entity_id']
+    cabin_class = data.get('cabin_class', 'economy')
+    adults = data.get('adults', 1)
+    sort_by = data.get('sort_by', 'best')
+    currency = data.get('currency', 'USD')
+    market = data.get('market', 'en-US')
+    country_code = data.get('country_code', 'US')
+
+    url = "https://sky-scrapper.p.rapidapi.com/api/v2/flights/searchFlightsComplete"
+    params = {
+        'originSkyId': origin_sky_id,
+        'destinationSkyId': destination_sky_id,
+        'originEntityId': origin_entity_id,
+        'destinationEntityId': destination_entity_id,
+        'cabinClass': cabin_class,
+        'adults': adults,
+        'sortBy': sort_by,
+        'currency': currency,
+        'market': market,
+        'countryCode': country_code
+    }
+    headers = {
+        'x-rapidapi-key': RAPIDAPI_KEY,
+        'x-rapidapi-host': 'sky-scrapper.p.rapidapi.com'
+    }
+    response = requests.get(url, params=params, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify(data)
+    else:
+        return jsonify({'error': 'Could not fetch flight data'}), response.status_code
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
