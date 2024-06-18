@@ -3,43 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Price Predictor</title>
+    <title>Flight Fare Search</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Flight Price Predictor</h1>
-    <form id="predict-form">
-        <label for="origin">Origin:</label>
-        <input type="text" id="origin" name="origin"><br><br>
-        <label for="destination">Destination:</label>
-        <input type="text" id="destination" name="destination"><br><br>
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date"><br><br>
-        <input type="submit" value="Predict">
-    </form>
-    <h2 id="result"></h2>
-    <script>
-        document.getElementById('predict-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var origin = document.getElementById('origin').value;
-            var destination = document.getElementById('destination').value;
-            var date = document.getElementById('date').value;
-
-            fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ origin: origin, destination: destination, date: date }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').innerText = `Predicted price: $${data.predicted_price}`;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        });
-    </script>
+    <header>
+        <h1>Flight Fare Search</h1>
+    </header>
+    <main>
+        <section id="search-form">
+            <h2>Search Flights</h2>
+            <form id="flight-search-form">
+                <label for="origin">Origin:</label>
+                <input type="text" id="origin" name="origin" required>
+                <label for="destination">Destination:</label>
+                <input type="text" id="destination" name="destination" required>
+                <label for="departure-date">Departure Date:</label>
+                <input type="date" id="departure-date" name="departure-date" required>
+                <label for="adults">Adults:</label>
+                <input type="number" id="adults" name="adults" min="1" value="1" required>
+                <label for="children">Children:</label>
+                <input type="number" id="children" name="children" min="0" value="0">
+                <label for="teens">Teens:</label>
+                <input type="number" id="teens" name="teens" min="0" value="0">
+                <label for="infants">Infants:</label>
+                <input type="number" id="infants" name="infants" min="0" value="0">
+                <button type="submit">Search Flights</button>
+            </form>
+        </section>
+        <section id="flight-results">
+            <!-- Flight search results will be displayed here -->
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Flight Fare Search</p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
-
